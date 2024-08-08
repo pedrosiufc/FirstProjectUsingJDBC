@@ -14,31 +14,65 @@ public class Program {
 
 	public static void main(String[] args) {
 
-		/*
-		 * Connection connection = null; Statement statement = null; ResultSet resultSet
-		 * = null;
-		 * 
-		 * try {
-		 * 
-		 * // create the connection connection = DB.getConnection(); // create the
-		 * connection status with the bank statement = connection.createStatement(); //
-		 * receives the Sql query resultSet =
-		 * statement.executeQuery("select * from departament");
-		 * 
-		 * while (resultSet.next()) { System.out.println(resultSet.getInt("Id") + ", " +
-		 * resultSet.getString("Name"));
-		 * 
-		 * }
-		 * 
-		 * } catch (SQLException e) { e.printStackTrace(); }
-		 * 
-		 * finally { DB.closeResultSet(resultSet); DB.closeStatement(statement);
-		 * DB.closeConnection(); }
-		 */
+		  Connection connection = null; 
+		 		  		
+		  //listandoDepartamentosExistentesNoBanco(connection);
+		  listandoVendedoresExistentesNoBanco(connection);
+		  //inserindoVendedoresNoBanco(connection);
+		 		 
+	}
 
+	public static void listandoDepartamentosExistentesNoBanco(Connection connection) {
+			
+		  Statement statement = null; 
+		  ResultSet resultSet = null;
+		
+		try {
+			  
+			  connection = DB.getConnection(); 
+			  statement = connection.createStatement(); 
+			  resultSet =
+			  statement.executeQuery("select * from departament");
+			  
+			  while (resultSet.next()) { System.out.println(resultSet.getInt("Id") + ", " +
+			  resultSet.getString("Name"));
+			  
+			  }
+			  
+			  } catch (SQLException e) { e.printStackTrace(); }
+			  
+			  finally { DB.closeResultSet(resultSet); DB.closeStatement(statement);
+			  DB.closeConnection(); }
+	}
+	
+	public static void listandoVendedoresExistentesNoBanco(Connection connection) {
+		
+		  Statement statement = null; 
+		  ResultSet resultSet = null;
+		
+		try {
+			  
+			  connection = DB.getConnection(); 
+			  statement = connection.createStatement(); 
+			  resultSet =
+			  statement.executeQuery("select * from seller");
+			  
+			  while (resultSet.next()) { System.out.println(resultSet.getInt("Id") + ", " +
+			  resultSet.getString("Name") + ", " + resultSet.getString("email")+ 
+			  ", " + resultSet.getString("birthDate")+ ", " + resultSet.getDouble("baseSalary"));
+			  
+			  }
+			  
+			  } catch (SQLException e) { e.printStackTrace(); }
+			  
+			  finally { DB.closeResultSet(resultSet); DB.closeStatement(statement);
+			  DB.closeConnection(); }
+	}
+	
+	public static void inserindoVendedoresNoBanco(Connection connection) {
+		
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-
-		Connection connection = null;
+		
 		PreparedStatement statement = null;
 
 		try {
@@ -75,7 +109,10 @@ public class Program {
 			DB.closeStatement(statement);
 			DB.closeConnection();
 		}
-
 	}
 
 }
+
+
+
+
