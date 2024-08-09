@@ -9,6 +9,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import db.DB;
+import db.DbExcepition;
+import db.DbIntegrityException;
 
 public class Program {
 
@@ -16,14 +18,17 @@ public class Program {
 
 		Connection connection = null;
 
-		// listandoDepartamentosExistentesNoBanco(connection);
-		// listandoVendedoresExistentesNoBanco(connection);
-		// inserindoVendedoresNoBanco(connection);
-		//inserindoNovosDepartamentosNoBD(connection);
-		atualizandoInformacoesNoBD(connection);
+		// listandoDepartamentosExistentesNoBD(connection);
+		// listandoVendedoresExistentesNoBD(connection);
+		// inserindoVendedoresNoBD(connection);
+		// inserindoNovosDepartamentosNoBD(connection);
+		// atualizandoInformacoesNoBD(connection);
+		// deletandoUmDepartamentoDoDB(connection);
+		// deletandoUmVendedorDoDB(connection);
+	 	validandoUmaTransacaoNoBD(connection);
 	}
 
-	public static void listandoDepartamentosExistentesNoBanco(Connection connection) {
+	public static void listandoDepartamentosExistentesNoBD(Connection connection) {
 
 		Statement statement = null;
 		ResultSet resultSet = null;
@@ -50,7 +55,7 @@ public class Program {
 		}
 	}
 
-	public static void listandoVendedoresExistentesNoBanco(Connection connection) {
+	public static void listandoVendedoresExistentesNoBD(Connection connection) {
 
 		Statement statement = null;
 		ResultSet resultSet = null;
@@ -79,7 +84,7 @@ public class Program {
 		}
 	}
 
-	public static void inserindoVendedoresNoBanco(Connection connection) {
+	public static void inserindoVendedoresNoBD(Connection connection) {
 
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -123,16 +128,15 @@ public class Program {
 
 	public static void inserindoNovosDepartamentosNoBD(Connection connection) {
 
-		//Inserindo novos departamentos e retornando seus Ids
-		
+		// Inserindo novos departamentos e retornando seus Ids
+
 		PreparedStatement statement = null;
 
 		try {
 			connection = DB.getConnection();
-			statement = connection.prepareStatement(
-					"INSERT INTO departament (Name) values ('VESTUARIO'), ('ENTREGAS')",
+			statement = connection.prepareStatement("INSERT INTO departament (Name) values ('VESTUARIO'), ('ENTREGAS')",
 					Statement.RETURN_GENERATED_KEYS);
-		
+
 			int rowsAffected = statement.executeUpdate();
 
 			if (rowsAffected > 0) {
@@ -156,21 +160,68 @@ public class Program {
 	}
 
 	public static void atualizandoInformacoesNoBD(Connection connection) {
-		
-		//atualizando dados no banco de dados
+
+		// atualizando dados no banco de dados
 		PreparedStatement statement = null;
 
 		try {
 			connection = DB.getConnection();
 			statement = connection.prepareStatement(
-					"UPDATE seller "
-					+ "SET BaseSalary = BaseSalary + ? "
-					+ "WHERE "
-					+ "(DepartmentId = ?)");
+					"UPDATE seller " + "SET BaseSalary = BaseSalary + ? " + "WHERE " + "(DepartmentId = ?)");
+
+			statement.setDouble(1, 200.0);
+			statement.setInt(2, 2);
+
+			int rowsAffected = statement.executeUpdate();
+
+			System.out.println("Done! Rows affected: " + rowsAffected);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		finally {
+			DB.closeStatement(statement);
+			DB.closeConnection();
+		}
+	}
+
+	public static void deletandoUmDepartamentoDoDB(Connection connection) {
+
+		// atualizando dados no banco de dados
+		PreparedStatement statement = null;
+
+		try {
+			connection = DB.getConnection();
+			statement = connection.prepareStatement("DELETE FROM departament " + "WHERE " + "Id = ?");
 			
-					statement.setDouble(1, 200.0);
-					statement.setInt(2, 2);
+			statement.setInt(1, 7);
+
+			int rowsAffected = statement.executeUpdate();
+
+			System.out.println("Done! Rows affected: " + rowsAffected);
+
+		} catch (SQLException e) {
+			throw new DbIntegrityException(e.getMessage());
+		}
+
+		finally {
+			DB.closeStatement(statement);
+			DB.closeConnection();
+		}
+	}
+
+	public static void deletandoUmVendedorDoDB(Connection connection) {
 		
+		// atualizando dados no banco de dados
+		PreparedStatement statement = null;
+
+		try {
+			connection = DB.getConnection();
+			statement = connection.prepareStatement("DELETE FROM seller " + "WHERE " + "Id = ?");
+			
+			statement.setInt(1, 8);
+
 			int rowsAffected = statement.executeUpdate();
 
 			System.out.println("Done! Rows affected: " + rowsAffected);
@@ -185,5 +236,47 @@ public class Program {
 		}
 	}
 	
-		
+	public static void validandoUmaTransacaoNoBD(Connection connection) {
+
+				
+		Statement statement = null;
+
+		try {
+			connection = DB.getConnection();
+			
+			connection.setAutoCommit(false);
+			
+			statement = connection.createStatement();
+			
+			int rows1=statement.executeUpdate("UPDATE seller SET BaseSalary = 2090 "
+					+ "WHERE DepartmentId =1");
+			
+			/*
+			 * int x=1; if(x<2) { throw new SQLException("Fake Error"); }
+			 */
+			
+			int rows2=statement.executeUpdate("UPDATE seller SET BaseSalary = 3090 "
+					+ "WHERE DepartmentId = 2");
+			
+			connection.commit();
+			
+			System.out.println("rows1 " + rows1);
+			System.out.println("rows2 " + rows2);
+			
+		} catch (SQLException e) {
+			try {
+				connection.rollback();
+				throw new DbExcepition("Transaction rolled Back! Caused by: " + e.getMessage());
+			} catch (SQLException e1) {
+				throw new DbExcepition("Error trying to rollvback! Cause by: " + e1.getMessage());
+			}
+		}
+
+		finally {
+			DB.closeStatement(statement);
+			DB.closeConnection();
+		}
+	}
+	
+	
 }
