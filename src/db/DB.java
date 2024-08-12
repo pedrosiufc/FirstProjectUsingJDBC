@@ -22,7 +22,7 @@ public class DB {
 			}
 
 			catch (SQLException e) {
-				throw new DbExcepition(e.getMessage());
+				throw new DbException(e.getMessage());
 			}
 		}
 		return conn;
@@ -34,7 +34,7 @@ public class DB {
 				conn.close();
 
 			} catch (SQLException e) {
-				throw new DbExcepition(e.getMessage());
+				throw new DbException(e.getMessage());
 			}
 		}
 	}
@@ -45,7 +45,7 @@ public class DB {
 			properties.load(fileInputStream);
 			return properties;
 		} catch (IOException e) {
-			throw new DbExcepition(e.getMessage());
+			throw new DbException(e.getMessage());
 		}
 
 	}
@@ -55,7 +55,7 @@ public class DB {
 			try {
 				statement.close();
 			} catch (SQLException e) {
-				throw new DbExcepition(e.getMessage());
+				throw new DbException(e.getMessage());
 			}
 		}
 	}
@@ -65,7 +65,7 @@ public class DB {
 			try {
 				resultSet.close();
 			} catch (SQLException e) {
-				throw new DbExcepition(e.getMessage());
+				throw new DbException(e.getMessage());
 			}
 		}
 	}

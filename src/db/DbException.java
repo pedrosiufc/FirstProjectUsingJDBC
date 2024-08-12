@@ -1,13 +1,13 @@
 package db;
 
-public class DbExcepition extends RuntimeException {
+public class DbException extends RuntimeException {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public DbExcepition(String mString) {
+	public DbException(String mString) {
 		
 	super(mString);
 
